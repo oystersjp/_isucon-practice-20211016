@@ -3,7 +3,7 @@
 gogo: stop-services build truncate-logs start-services bench
 
 build:
-	make -C go build
+	make -C go build -o isucholar
 
 stop-services:
 	sudo systemctl stop nginx

@@ -1,4 +1,4 @@
-DEST=$(PWD)/isucholar
+DEST=$(PWD)/go/isucholar
 COMPILER=go
 GO_FILES=$(wildcard ./*.go ./**/*.go)
 
