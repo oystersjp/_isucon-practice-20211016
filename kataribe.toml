@@ -67,7 +67,7 @@ regexp = '^(GET|HEAD) /api/courses/[A-Z0-9]+'
 name = "get /api/courses/[A-Z0-9]+(SearchCourses)"
 
 [[bundle]]
-regexp = '^(GET|HEAD) /api/courses?*'
+regexp = '^(GET|HEAD) /api/courses?.*'
 name = "get /api/courses?*(SearchCourses)"
 
 [[bundle]]
