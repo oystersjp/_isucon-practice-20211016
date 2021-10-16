@@ -115,6 +115,26 @@ func (h *handlers) Initialize(c echo.Context) error {
 		}
 	}
 
+	query := "INSERT INTO `gpas`(user_id, gpa)" +
+	"SELECT users.id, IFNULL(SUM(`submissions`.`score` * `courses`.`credit`), 0) / 100 / `credits`.`credits`" +
+	"FROM `users`  JOIN (" +
+	"     SELECT `users`.`id` AS `user_id`, SUM(`courses`.`credit`) AS `credits`" +
+	"     FROM `users`" +
+	"     JOIN `registrations` ON `users`.`id` = `registrations`.`user_id`" +
+	"     JOIN `courses` ON `registrations`.`course_id` = `courses`.`id` AND `courses`.`status` = ?" +
+	"     GROUP BY `users`.`id`" +
+	" ) AS `credits` ON `credits`.`user_id` = `users`.`id`" +
+	" JOIN `registrations` ON `users`.`id` = `registrations`.`user_id`" +
+	" JOIN `courses` ON `registrations`.`course_id` = `courses`.`id` AND `courses`.`status` = ?" +
+	" LEFT JOIN `classes` ON `courses`.`id` = `classes`.`course_id`" +
+	" LEFT JOIN `submissions` ON `users`.`id` = `submissions`.`user_id` AND `submissions`.`class_id` = `classes`.`id`" +
+	" WHERE `users`.`type` = ?" +
+	" GROUP BY `users`.`id`"
+	if _, err := dbForInit.Exec(query,StatusClosed,StatusClosed,Student); err != nil {
+		c.Logger().Error(err)
+		return c.NoContent(http.StatusInternalServerError)
+	}
+
 	if err := exec.Command("rm", "-rf", AssignmentsDirectory).Run(); err != nil {
 		c.Logger().Error(err)
 		return c.NoContent(http.StatusInternalServerError)
@@ -663,22 +683,8 @@ func (h *handlers) GetGrades(c echo.Context) error {
 	// GPAの統計値
 	// 一つでも修了した科目がある学生のGPA一覧
 	var gpas []float64
-	query = "SELECT IFNULL(SUM(`submissions`.`score` * `courses`.`credit`), 0) / 100 / `credits`.`credits` AS `gpa`" +
-		" FROM `users`" +
-		" JOIN (" +
-		"     SELECT `users`.`id` AS `user_id`, SUM(`courses`.`credit`) AS `credits`" +
-		"     FROM `users`" +
-		"     JOIN `registrations` ON `users`.`id` = `registrations`.`user_id`" +
-		"     JOIN `courses` ON `registrations`.`course_id` = `courses`.`id` AND `courses`.`status` = ?" +
-		"     GROUP BY `users`.`id`" +
-		" ) AS `credits` ON `credits`.`user_id` = `users`.`id`" +
-		" JOIN `registrations` ON `users`.`id` = `registrations`.`user_id`" +
-		" JOIN `courses` ON `registrations`.`course_id` = `courses`.`id` AND `courses`.`status` = ?" +
-		" LEFT JOIN `classes` ON `courses`.`id` = `classes`.`course_id`" +
-		" LEFT JOIN `submissions` ON `users`.`id` = `submissions`.`user_id` AND `submissions`.`class_id` = `classes`.`id`" +
-		" WHERE `users`.`type` = ?" +
-		" GROUP BY `users`.`id`"
-	if err := h.DB.Select(&gpas, query, StatusClosed, StatusClosed, Student); err != nil {
+	query = "SELECT gpa AS `gpa` from gpas"
+	if err := h.DB.Select(&gpas, query); err != nil {
 		c.Logger().Error(err)
 		return c.NoContent(http.StatusInternalServerError)
 	}
@@ -1199,6 +1205,28 @@ func (h *handlers) RegisterScores(c echo.Context) error {
 
 	for _, score := range req {
 		if _, err := tx.Exec("UPDATE `submissions` JOIN `users` ON `users`.`id` = `submissions`.`user_id` SET `score` = ? WHERE `users`.`code` = ? AND `class_id` = ?", score.Score, score.UserCode, classID); err != nil {
+			c.Logger().Error(err)
+			return c.NoContent(http.StatusInternalServerError)
+		}
+		query := "INSERT INTO `gpas`(user_id, gpa)" +
+		" SELECT users.id, IFNULL(SUM(`submissions`.`score` * `courses`.`credit`), 0) / 100 / `credits`.`credits`" +
+		" FROM `users`" +
+		" JOIN (" +
+		"     SELECT `users`.`id` AS `user_id`, SUM(`courses`.`credit`) AS `credits`" +
+		"     FROM `users`" +
+		"     JOIN `registrations` ON `users`.`id` = `registrations`.`user_id`" +
+		"     JOIN `courses` ON `registrations`.`course_id` = `courses`.`id` AND `courses`.`status` = ?" +
+		"     GROUP BY `users`.`id`" +
+		" ) AS `credits` ON `credits`.`user_id` = `users`.`id`" +
+		" JOIN `registrations` ON `users`.`id` = `registrations`.`user_id`" +
+		" JOIN `courses` ON `registrations`.`course_id` = `courses`.`id` AND `courses`.`status` = ?" +
+		" LEFT JOIN `classes` ON `courses`.`id` = `classes`.`course_id`" +
+		" LEFT JOIN `submissions` ON `users`.`id` = `submissions`.`user_id` AND `submissions`.`class_id` = `classes`.`id`" +
+		" WHERE `users`.`type` = ?" +
+		" WHERE `users`.`code` = ?" +
+		" GROUP BY `users`.`id`" +
+		" ON DUPLICATE KEY UPDATE user_id = VALUES(user_id)"
+		if _, err := tx.Exec(query,StatusClosed,StatusClosed,Student,score.UserCode); err != nil {
 			c.Logger().Error(err)
 			return c.NoContent(http.StatusInternalServerError)
 		}

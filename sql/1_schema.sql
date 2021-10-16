@@ -1,4 +1,5 @@
 -- CREATEと逆順
+DROP TABLE IF EXISTS `gpas`;
 DROP TABLE IF EXISTS `unread_announcements`;
 DROP TABLE IF EXISTS `announcements`;
 DROP TABLE IF EXISTS `submissions`;
@@ -82,4 +83,12 @@ CREATE TABLE `unread_announcements`
     PRIMARY KEY (`announcement_id`, `user_id`),
     CONSTRAINT FK_unread_announcements_announcement_id FOREIGN KEY (`announcement_id`) REFERENCES `announcements` (`id`),
     CONSTRAINT FK_unread_announcements_user_id FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+);
+
+CREATE TABLE `gpas`
+(
+    `id`       INT PRIMARY KEY auto_increment,
+    `user_id`  CHAR(26) UNIQUE NOT NULL,
+    `gpa`      Decimal(2, 1) NOT NULL,
+    CONSTRAINT FK_gpas_user_id FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
 );
