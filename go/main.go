@@ -116,8 +116,8 @@ func (h *handlers) Initialize(c echo.Context) error {
 	}
 
 	query := "INSERT INTO `gpas`(user_id, gpa)" +
-	"FROM SELECT users.id, IFNULL(SUM(`submissions`.`score` * `courses`.`credit`), 0) / 100 / `credits`.`credits`" +
-	" JOIN (" +
+	"SELECT users.id, IFNULL(SUM(`submissions`.`score` * `courses`.`credit`), 0) / 100 / `credits`.`credits`" +
+	"FROM `users`  JOIN (" +
 	"     SELECT `users`.`id` AS `user_id`, SUM(`courses`.`credit`) AS `credits`" +
 	"     FROM `users`" +
 	"     JOIN `registrations` ON `users`.`id` = `registrations`.`user_id`" +
@@ -1209,7 +1209,7 @@ func (h *handlers) RegisterScores(c echo.Context) error {
 			return c.NoContent(http.StatusInternalServerError)
 		}
 		query := "INSERT INTO `gpas`(user_id, gpa)" +
-		" FROM SELECT users.id, IFNULL(SUM(`submissions`.`score` * `courses`.`credit`), 0) / 100 / `credits`.`credits`" +
+		" SELECT users.id, IFNULL(SUM(`submissions`.`score` * `courses`.`credit`), 0) / 100 / `credits`.`credits`" +
 		" FROM `users`" +
 		" JOIN (" +
 		"     SELECT `users`.`id` AS `user_id`, SUM(`courses`.`credit`) AS `credits`" +
