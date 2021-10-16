@@ -1,6 +1,6 @@
 .PHONY: gogo build stop-services start-services truncate-logs bench
 
-gogo: stop-services build truncate-logs start-services
+gogo: stop-services build truncate-logs start-services bench
 
 build:
 	make -C go build
