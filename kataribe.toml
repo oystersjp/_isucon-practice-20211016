@@ -79,6 +79,10 @@ regexp = '^(POST|HEAD) /api/courses/[A-Z0-9]+/classes/[A-Z0-9]+/assignments'
 name = "post /api/courses/[A-Z0-9]+/classes/[A-Z0-9]+/assignments(SubmitAssignment)"
 
 [[bundle]]
+regexp = '^(POST|HEAD) /api/courses/[A-Z0-9]+/classes/[A-Z0-9]+/assignments/scores'
+name = "post PUT /api/courses/[A-Z0-9]+/classes/[A-Z0-9]+/assignments/scores(RegisterScores)"
+
+[[bundle]]
 regexp = '^(GET|HEAD) /api/courses/[A-Z0-9]+/classes/[A-Z0-9]+/assignments/export'
 name = "get /api/courses/[A-Z0-9]+/classes/[A-Z0-9]+/assignments/export(DownloadSubmittedAssignments)"
 
