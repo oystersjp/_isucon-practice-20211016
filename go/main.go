@@ -129,7 +129,6 @@ func (h *handlers) Initialize(c echo.Context) error {
 	" LEFT JOIN `classes` ON `courses`.`id` = `classes`.`course_id`" +
 	" LEFT JOIN `submissions` ON `users`.`id` = `submissions`.`user_id` AND `submissions`.`class_id` = `classes`.`id`" +
 	" WHERE `users`.`type` = ?" +
-	" WHERE `users`.`id` = `users`.`id`" +
 	" GROUP BY `users`.`id`"
 	if _, err := dbForInit.Exec(query,StatusClosed,StatusClosed,Student); err != nil {
 		c.Logger().Error(err)
@@ -1226,9 +1225,8 @@ func (h *handlers) RegisterScores(c echo.Context) error {
 	" LEFT JOIN `classes` ON `courses`.`id` = `classes`.`course_id`" +
 	" LEFT JOIN `submissions` ON `users`.`id` = `submissions`.`user_id` AND `submissions`.`class_id` = `classes`.`id`" +
 	" WHERE `users`.`type` = ?" +
-	" WHERE `users`.`id` = `users`.`id`" +
 	" GROUP BY `users`.`id`" +
-	"ON DUPLICATE KEY UPDATE user_id = VALUES(user_id)"
+	" ON DUPLICATE KEY UPDATE user_id = VALUES(user_id)"
 	if _, err := tx.Exec(query,StatusClosed,StatusClosed,Student); err != nil {
 		c.Logger().Error(err)
 		return c.NoContent(http.StatusInternalServerError)
