@@ -63,8 +63,12 @@ regexp = '^(GET|HEAD) /images/'
 name = "images"
 
 [[bundle]]
-regexp = '^(GET|HEAD) /api/courses/[[A-Z0-9]]/classes'
+regexp = '^(GET|HEAD) /api/courses/[A-Z0-9]+/classes'
 name = "get classes(SearchCourses)"
+
+[[bundle]]
+regexp = '^(GET|HEAD) /api/courses/[A-Z0-9]+/classes/[A-Z0-9]+/assignments/export'
+name = "get export(DownloadSubmittedAssignments)"
 
 # You can replace the part of urls which matched to your regular expressions.
 # For overview of regexp syntax: https://golang.org/pkg/regexp/syntax/
