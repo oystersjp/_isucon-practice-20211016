@@ -75,6 +75,10 @@ regexp = '^(POST|HEAD) /api/courses/[A-Z0-9]+'
 name = "post /api/courses/[A-Z0-9]+(IsAdmin)"
 
 [[bundle]]
+regexp = '^(PUT|HEAD) /api/courses/[A-Z0-9]+/status'
+name = "post /api/courses/[A-Z0-9]+/status(SetCourseStatus)"
+
+[[bundle]]
 regexp = '^(GET|HEAD) /api/courses/[A-Z0-9]+/classes'
 name = "get /api/courses/[A-Z0-9]+/classes (GetClasses)"
 
