@@ -83,3 +83,12 @@ CREATE TABLE `unread_announcements`
     CONSTRAINT FK_unread_announcements_announcement_id FOREIGN KEY (`announcement_id`) REFERENCES `announcements` (`id`),
     CONSTRAINT FK_unread_announcements_user_id FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
 );
+
+CREATE TABLE `gpas`
+(
+    `id`         CHAR(26) PRIMARY KEY,
+    `user_id`  CHAR(26)     NOT NULL,
+    `gpas`      Decimal(2, 1) NOT NULL,
+    `message`    TEXT         NOT NULL,
+    CONSTRAINT FK_gpas_user_id FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+);
