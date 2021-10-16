@@ -8,17 +8,17 @@ build:
 stop-services:
 	sudo systemctl stop nginx
 	sudo systemctl stop isucholar.go.service
-	sudo systemctl stop mysql
+	ssh db sudo systemctl stop mysql
 
 start-services:
-	sudo systemctl start mysql
+	ssh db sudo systemctl start mysql
 	sudo systemctl start isucholar.go.service
 	sudo systemctl start nginx
 
 truncate-logs:
 	sudo truncate --size 0 /var/log/nginx/access.log
 	sudo truncate --size 0 /var/log/nginx/error.log
-	sudo truncate --size 0 /var/log/mysql/mysql-slow.log 
+	ssh db sudo truncate --size 0 /var/log/mysql/mysql-slow.log
 
 kataribe:
 	cd ../ && sudo cat /var/log/nginx/access.log | ./kataribe
