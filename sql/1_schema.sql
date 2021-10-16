@@ -89,6 +89,6 @@ CREATE TABLE `gpas`
 (
     `id`       INT PRIMARY KEY auto_increment,
     `user_id`  CHAR(26) UNIQUE NOT NULL,
-    `gpas`      Decimal(2, 1) NOT NULL,
+    `gpa`      Decimal(2, 1) NOT NULL,
     CONSTRAINT FK_gpas_user_id FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
 );

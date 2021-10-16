@@ -115,7 +115,7 @@ func (h *handlers) Initialize(c echo.Context) error {
 		}
 	}
 
-	query := "INSERT INTO `gpas`(user_id, gpas)" +
+	query := "INSERT INTO `gpas`(user_id, gpa)" +
 	"FROM SELECT users.id, IFNULL(SUM(`submissions`.`score` * `courses`.`credit`), 0) / 100 / `credits`.`credits`" +
 	" JOIN (" +
 	"     SELECT `users`.`id` AS `user_id`, SUM(`courses`.`credit`) AS `credits`" +
@@ -684,7 +684,7 @@ func (h *handlers) GetGrades(c echo.Context) error {
 	// GPAの統計値
 	// 一つでも修了した科目がある学生のGPA一覧
 	var gpas []float64
-	query = "SELECT gpas AS `gpa` from gpas"
+	query = "SELECT gpa AS `gpa` from gpas"
 	if err := h.DB.Select(&gpas, query); err != nil {
 		c.Logger().Error(err)
 		return c.NoContent(http.StatusInternalServerError)
@@ -1211,7 +1211,7 @@ func (h *handlers) RegisterScores(c echo.Context) error {
 		}
 	}
 	
-	query := "INSERT INTO `gpas`(user_id, gpas)" +
+	query := "INSERT INTO `gpas`(user_id, gpa)" +
 	"FROM SELECT users.id, IFNULL(SUM(`submissions`.`score` * `courses`.`credit`), 0) / 100 / `credits`.`credits`" +
 	" FROM `users`" +
 	" JOIN (" +
