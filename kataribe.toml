@@ -82,6 +82,10 @@ name = "get /api/courses/[A-Z0-9]+/classes/[A-Z0-9]+/assignments/export(Download
 regexp = '^(GET|HEAD) /api/announcements?page=[0-9]+'
 name = "get /api/announcements?page=[0-9]+(GetAnnouncementList)"
 
+[[bundle]]
+regexp = '^(GET|HEAD) /api/announcements/[A-Z0-9]+'
+name = "get /api/announcements/[A-Z0-9]+(GetAnnouncementDetail)"
+
 # You can replace the part of urls which matched to your regular expressions.
 # For overview of regexp syntax: https://golang.org/pkg/regexp/syntax/
 #[[replace]]
