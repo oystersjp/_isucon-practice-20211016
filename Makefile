@@ -1,4 +1,4 @@
-.PHONY: gogo build stop-services start-services truncate-logs bench
+.PHONY: gogo build stop-services start-services truncate-logs bench kataribe
 
 gogo: stop-services build truncate-logs start-services bench
 
@@ -21,7 +21,7 @@ truncate-logs:
 	ssh db sudo truncate --size 0 /var/log/mysql/mysql-slow.log
 
 kataribe:
-	cd ../ && sudo cat /var/log/nginx/access.log | ./kataribe
+	sudo cat /var/log/nginx/access.log | ./kataribe
 
 bench:
 	sudo -u ubuntu ssh bench "sudo /home/isucon/benchmarker/bin/benchmarker -target 52.69.9.115 -tls"

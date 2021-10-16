@@ -62,6 +62,46 @@ name = "stylesheets"
 regexp = '^(GET|HEAD) /images/'
 name = "images"
 
+[[bundle]]
+regexp = '^(GET|HEAD) /api/courses/[A-Z0-9]+'
+name = "get /api/courses/[A-Z0-9]+(SearchCourses)"
+
+[[bundle]]
+regexp = '^(GET|HEAD) /api/courses?.*'
+name = "get /api/courses?*(SearchCourses)"
+
+[[bundle]]
+regexp = '^(POST|HEAD) /api/courses/[A-Z0-9]+'
+name = "post /api/courses/[A-Z0-9]+(IsAdmin)"
+
+[[bundle]]
+regexp = '^(PUT|HEAD) /api/courses/[A-Z0-9]+/status'
+name = "post /api/courses/[A-Z0-9]+/status(SetCourseStatus)"
+
+[[bundle]]
+regexp = '^(GET|HEAD) /api/courses/[A-Z0-9]+/classes'
+name = "get /api/courses/[A-Z0-9]+/classes (GetClasses)"
+
+[[bundle]]
+regexp = '^(POST|HEAD) /api/courses/[A-Z0-9]+/classes/[A-Z0-9]+/assignments'
+name = "post /api/courses/[A-Z0-9]+/classes/[A-Z0-9]+/assignments(SubmitAssignment)"
+
+[[bundle]]
+regexp = '^(PUT|HEAD) /api/courses/[A-Z0-9]+/classes/[A-Z0-9]+/assignments/scores'
+name = "put /api/courses/[A-Z0-9]+/classes/[A-Z0-9]+/assignments/scores(RegisterScores)"
+
+[[bundle]]
+regexp = '^(GET|HEAD) /api/courses/[A-Z0-9]+/classes/[A-Z0-9]+/assignments/export'
+name = "get /api/courses/[A-Z0-9]+/classes/[A-Z0-9]+/assignments/export(DownloadSubmittedAssignments)"
+
+[[bundle]]
+regexp = '^(GET|HEAD) /api/announcements\?page=[0-9]+'
+name = "get /api/announcements?page=[0-9]+(GetAnnouncementList)"
+
+[[bundle]]
+regexp = '^(GET|HEAD) /api/announcements/[A-Z0-9]+'
+name = "get /api/announcements/[A-Z0-9]+(GetAnnouncementDetail)"
+
 # You can replace the part of urls which matched to your regular expressions.
 # For overview of regexp syntax: https://golang.org/pkg/regexp/syntax/
 #[[replace]]
