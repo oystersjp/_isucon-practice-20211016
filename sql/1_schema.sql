@@ -1,4 +1,6 @@
 -- CREATEと逆順
+drop trigger gogo;
+DROP TABLE IF EXISTS `gpas`;
 DROP TABLE IF EXISTS `unread_announcements`;
 DROP TABLE IF EXISTS `announcements`;
 DROP TABLE IF EXISTS `submissions`;
@@ -83,3 +85,18 @@ CREATE TABLE `unread_announcements`
     CONSTRAINT FK_unread_announcements_announcement_id FOREIGN KEY (`announcement_id`) REFERENCES `announcements` (`id`),
     CONSTRAINT FK_unread_announcements_user_id FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
 );
+
+CREATE TABLE `gpas`
+(
+    `id`       INT PRIMARY KEY auto_increment,
+    `user_id`  CHAR(26) UNIQUE NOT NULL,
+    `gpa`      Decimal(2, 1) NOT NULL,
+    CONSTRAINT FK_gpas_user_id FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+);
+
+CREATE TRIGGER `gogo` AFTER INSERT ON `submissions`
+    FOR EACH ROW
+    INSERT INTO gpas (user_id, gpa)
+    SELECT users.id as user_id, IFNULL(SUM(`submissions`.`score` * `courses`.`credit`), 0) / 100 / `credits`.`credits` AS `gpa` FROM `users` JOIN (     SELECT `users`.`id` AS `user_id`, SUM(`courses`.`credit`) AS `credits`     FROM `users`     JOIN `registrations` ON `users`.`id` = `registrations`.`user_id`     JOIN `courses` ON `registrations`.`course_id` = `courses`.`id` AND `courses`.`status` = 'closed'     GROUP BY `users`.`id` ) AS `credits` ON `credits`.`user_id` = `users`.`id` JOIN `registrations` ON `users`.`id` = `registrations`.`user_id` JOIN `courses` ON `registrations`.`course_id` = `courses`.`id` AND `courses`.`status` = 'closed' LEFT JOIN `classes` ON `courses`.`id` = `classes`.`course_id` LEFT JOIN `submissions` ON `users`.`id` = `submissions`.`user_id` AND `submissions`.`class_id` = `classes`.`id` WHERE `users`.`type` = 'student' and `users`.`id` = NEWD.user_id
+    ON DUPLICATE KEY UPDATE gpa = VALUES(gpa)
+;
