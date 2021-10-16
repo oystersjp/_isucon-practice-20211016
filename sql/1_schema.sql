@@ -1,5 +1,5 @@
 -- CREATEと逆順
-drop trigger gogo;
+drop trigger if exists gogo;
 DROP TABLE IF EXISTS `gpas`;
 DROP TABLE IF EXISTS `unread_announcements`;
 DROP TABLE IF EXISTS `announcements`;
