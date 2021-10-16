@@ -121,8 +121,8 @@ func (h *handlers) Initialize(c echo.Context) error {
 		c.Logger().Error(err)
 		return c.NoContent(http.StatusInternalServerError)
 	}
-	for _, user := range users {
-		query = "INSERT INTO `gpas` (`user_id`, `gpas`) VALUES (IFNULL(SUM(`submissions`.`score` * `courses`.`credit`), 0) / 100 / `credits`.`credits`, ?" +
+
+	query = "INSERT INTO `gpas` (`user_id`, `gpas`) VALUES (`users`.`id`, IFNULL(SUM(`submissions`.`score` * `courses`.`credit`), 0) / 100 / `credits`.`credits`" +
 		" FROM `users`" +
 		" JOIN (" +
 		"     SELECT `users`.`id` AS `user_id`, SUM(`courses`.`credit`) AS `credits`" +
@@ -136,12 +136,11 @@ func (h *handlers) Initialize(c echo.Context) error {
 		" LEFT JOIN `classes` ON `courses`.`id` = `classes`.`course_id`" +
 		" LEFT JOIN `submissions` ON `users`.`id` = `submissions`.`user_id` AND `submissions`.`class_id` = `classes`.`id`" +
 		" WHERE `users`.`type` = ?" +
-		" WHERE `users`.`id` = ?" +
+		" WHERE `users`.`id` = `users`.`id`" +
 		" GROUP BY `users`.`id`"
-		if _, err := dbForInit.Exec(query,user.ID,StatusClosed,StatusClosed,Student,user.ID); err != nil {
-			c.Logger().Error(err)
-			return c.NoContent(http.StatusInternalServerError)
-		}
+	if _, err := dbForInit.Exec(query,StatusClosed,StatusClosed,Student); err != nil {
+		c.Logger().Error(err)
+		return c.NoContent(http.StatusInternalServerError)
 	}
 
 	if err := exec.Command("rm", "-rf", AssignmentsDirectory).Run(); err != nil {
@@ -1226,27 +1225,27 @@ func (h *handlers) RegisterScores(c echo.Context) error {
 		c.Logger().Error(err)
 		return c.NoContent(http.StatusInternalServerError)
 	}
-	for _, user := range users {
-		query = "UPDATE `gpas`  SET `user_id` = ? , `gpas` = IFNULL(SUM(`submissions`.`score` * `courses`.`credit`), 0) / 100 / `credits`.`credits`" +
-		" FROM `users`" +
-		" JOIN (" +
-		"     SELECT `users`.`id` AS `user_id`, SUM(`courses`.`credit`) AS `credits`" +
-		"     FROM `users`" +
-		"     JOIN `registrations` ON `users`.`id` = `registrations`.`user_id`" +
-		"     JOIN `courses` ON `registrations`.`course_id` = `courses`.`id` AND `courses`.`status` = ?" +
-		"     GROUP BY `users`.`id`" +
-		" ) AS `credits` ON `credits`.`user_id` = `users`.`id`" +
-		" JOIN `registrations` ON `users`.`id` = `registrations`.`user_id`" +
-		" JOIN `courses` ON `registrations`.`course_id` = `courses`.`id` AND `courses`.`status` = ?" +
-		" LEFT JOIN `classes` ON `courses`.`id` = `classes`.`course_id`" +
-		" LEFT JOIN `submissions` ON `users`.`id` = `submissions`.`user_id` AND `submissions`.`class_id` = `classes`.`id`" +
-		" WHERE `users`.`type` = ?" +
-		" WHERE `users`.`id` = ?" +
-		" GROUP BY `users`.`id`"
-		if _, err := tx.Exec(query,user.ID,StatusClosed,StatusClosed,Student,user.ID); err != nil {
-			c.Logger().Error(err)
-			return c.NoContent(http.StatusInternalServerError)
-		}
+
+	query = "INSERT INTO `gpas`(user_id, gpas) VALUES (`users`.`id`, IFNULL(SUM(`submissions`.`score` * `courses`.`credit`), 0) / 100 / `credits`.`credits`" +
+	" FROM `users`" +
+	" JOIN (" +
+	"     SELECT `users`.`id` AS `user_id`, SUM(`courses`.`credit`) AS `credits`" +
+	"     FROM `users`" +
+	"     JOIN `registrations` ON `users`.`id` = `registrations`.`user_id`" +
+	"     JOIN `courses` ON `registrations`.`course_id` = `courses`.`id` AND `courses`.`status` = ?" +
+	"     GROUP BY `users`.`id`" +
+	" ) AS `credits` ON `credits`.`user_id` = `users`.`id`" +
+	" JOIN `registrations` ON `users`.`id` = `registrations`.`user_id`" +
+	" JOIN `courses` ON `registrations`.`course_id` = `courses`.`id` AND `courses`.`status` = ?" +
+	" LEFT JOIN `classes` ON `courses`.`id` = `classes`.`course_id`" +
+	" LEFT JOIN `submissions` ON `users`.`id` = `submissions`.`user_id` AND `submissions`.`class_id` = `classes`.`id`" +
+	" WHERE `users`.`type` = ?" +
+	" WHERE `users`.`id` = `users`.`id`" +
+	" GROUP BY `users`.`id`" +
+	"ON DUPLICATE KEY UPDATE user_id = VALUES(user_id)"
+	if _, err := tx.Exec(query,StatusClosed,StatusClosed,Student); err != nil {
+		c.Logger().Error(err)
+		return c.NoContent(http.StatusInternalServerError)
 	}
 
 	if err := tx.Commit(); err != nil {
