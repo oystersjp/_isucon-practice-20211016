@@ -115,29 +115,22 @@ func (h *handlers) Initialize(c echo.Context) error {
 		}
 	}
 
-	query := "SELECT id from users"
-	var users []User
-	if err := dbForInit.Select(&users, query); err != nil {
-		c.Logger().Error(err)
-		return c.NoContent(http.StatusInternalServerError)
-	}
-
-	query = "INSERT INTO `gpas` (`user_id`, `gpas`) VALUES (`users`.`id`, IFNULL(SUM(`submissions`.`score` * `courses`.`credit`), 0) / 100 / `credits`.`credits`" +
-		" FROM `users`" +
-		" JOIN (" +
-		"     SELECT `users`.`id` AS `user_id`, SUM(`courses`.`credit`) AS `credits`" +
-		"     FROM `users`" +
-		"     JOIN `registrations` ON `users`.`id` = `registrations`.`user_id`" +
-		"     JOIN `courses` ON `registrations`.`course_id` = `courses`.`id` AND `courses`.`status` = ?" +
-		"     GROUP BY `users`.`id`" +
-		" ) AS `credits` ON `credits`.`user_id` = `users`.`id`" +
-		" JOIN `registrations` ON `users`.`id` = `registrations`.`user_id`" +
-		" JOIN `courses` ON `registrations`.`course_id` = `courses`.`id` AND `courses`.`status` = ?" +
-		" LEFT JOIN `classes` ON `courses`.`id` = `classes`.`course_id`" +
-		" LEFT JOIN `submissions` ON `users`.`id` = `submissions`.`user_id` AND `submissions`.`class_id` = `classes`.`id`" +
-		" WHERE `users`.`type` = ?" +
-		" WHERE `users`.`id` = `users`.`id`" +
-		" GROUP BY `users`.`id`"
+	query := "INSERT INTO `gpas`(user_id, gpas)" +
+	"FROM SELECT users.id, IFNULL(SUM(`submissions`.`score` * `courses`.`credit`), 0) / 100 / `credits`.`credits`" +
+	" JOIN (" +
+	"     SELECT `users`.`id` AS `user_id`, SUM(`courses`.`credit`) AS `credits`" +
+	"     FROM `users`" +
+	"     JOIN `registrations` ON `users`.`id` = `registrations`.`user_id`" +
+	"     JOIN `courses` ON `registrations`.`course_id` = `courses`.`id` AND `courses`.`status` = ?" +
+	"     GROUP BY `users`.`id`" +
+	" ) AS `credits` ON `credits`.`user_id` = `users`.`id`" +
+	" JOIN `registrations` ON `users`.`id` = `registrations`.`user_id`" +
+	" JOIN `courses` ON `registrations`.`course_id` = `courses`.`id` AND `courses`.`status` = ?" +
+	" LEFT JOIN `classes` ON `courses`.`id` = `classes`.`course_id`" +
+	" LEFT JOIN `submissions` ON `users`.`id` = `submissions`.`user_id` AND `submissions`.`class_id` = `classes`.`id`" +
+	" WHERE `users`.`type` = ?" +
+	" WHERE `users`.`id` = `users`.`id`" +
+	" GROUP BY `users`.`id`"
 	if _, err := dbForInit.Exec(query,StatusClosed,StatusClosed,Student); err != nil {
 		c.Logger().Error(err)
 		return c.NoContent(http.StatusInternalServerError)
@@ -1217,16 +1210,9 @@ func (h *handlers) RegisterScores(c echo.Context) error {
 			return c.NoContent(http.StatusInternalServerError)
 		}
 	}
-	query := "SELECT id from users"
-
-	var users []User
-
-	if err := tx.Select(&users, query); err != nil {
-		c.Logger().Error(err)
-		return c.NoContent(http.StatusInternalServerError)
-	}
-
-	query = "INSERT INTO `gpas`(user_id, gpas) VALUES (`users`.`id`, IFNULL(SUM(`submissions`.`score` * `courses`.`credit`), 0) / 100 / `credits`.`credits`" +
+	
+	query := "INSERT INTO `gpas`(user_id, gpas)" +
+	"FROM SELECT users.id, IFNULL(SUM(`submissions`.`score` * `courses`.`credit`), 0) / 100 / `credits`.`credits`" +
 	" FROM `users`" +
 	" JOIN (" +
 	"     SELECT `users`.`id` AS `user_id`, SUM(`courses`.`credit`) AS `credits`" +
