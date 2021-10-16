@@ -25,4 +25,4 @@ kataribe:
 	cd ../ && sudo cat /var/log/nginx/access.log | ./kataribe
 
 bench:
-	sudo /home/isucon/benchmarker/bin/benchmarker -target 52.69.9.115 -tls
+	sudo -u ubuntu ssh bench "sudo /home/isucon/benchmarker/bin/benchmarker -target 52.69.9.115 -tls"
