@@ -1,4 +1,5 @@
 -- CREATEと逆順
+DROP TABLE IF EXISTS `gpas`;
 DROP TABLE IF EXISTS `unread_announcements`;
 DROP TABLE IF EXISTS `announcements`;
 DROP TABLE IF EXISTS `submissions`;
@@ -89,6 +90,5 @@ CREATE TABLE `gpas`
     `id`         CHAR(26) PRIMARY KEY,
     `user_id`  CHAR(26)     NOT NULL,
     `gpas`      Decimal(2, 1) NOT NULL,
-    `message`    TEXT         NOT NULL,
     CONSTRAINT FK_gpas_user_id FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
 );
