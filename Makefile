@@ -3,7 +3,7 @@
 gogo: stop-services build truncate-logs start-services
 
 build:
-	make -C webapp/go build
+	make -C go build
 
 stop-services:
 	sudo systemctl stop nginx
